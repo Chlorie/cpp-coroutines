@@ -37,10 +37,12 @@ namespace clu
 
         public:
             generator<T> get_return_object();
-            std::suspend_always yield_value(T value)
+
+            template <typename U> requires std::assignable_from<T&, U&&>
+            std::suspend_always yield_value(U&& value)
             {
                 throw_if_needed();
-                value_ = std::move(value);
+                value_ = std::forward<U>(value);
                 return {};
             }
 

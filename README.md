@@ -2,6 +2,13 @@
 
 Test things out and try to learn C++20 coroutines.
 
+- `concepts.h`: Basic coroutine concepts.
+
+  ```cpp
+  static_assert(clu::awaiter<clu::task<>>);
+  static_assert(clu::awaitable_of<clu::task<int>, int>)
+  ```
+  
 - `generator.h`: Generator type `generator<T>`, supports `co_yield` operations.
 
   ```cpp
@@ -16,14 +23,16 @@ Test things out and try to learn C++20 coroutines.
   }
   static_assert(std::ranges::input_range<clu::generator<int>>);
   ```
-
-- `task.h`: Lazy task type `task<T>`, supports `co_await` operations.
+  
+- `schedule.h`: Defines `scheduler` concept and provides a generic `schedule_on` function template for scheduling tasks.
 
   ```cpp
-  clu::task<> some_task()
+  static_assert(clu::scheduler<clu::static_thread_pool>);
+  
+  clu::task<> scheduled_task(clu::scheduler auto& sch)
   {
-      const int result = co_await async_long_task();
-      co_return 42 + result;
+      co_await clu::schedule_on(sch);
+      std::cout << "On scheduler!\n";
   }
   ```
 
@@ -34,5 +43,28 @@ Test things out and try to learn C++20 coroutines.
   {
       spawn(some_task()); // Be careful that the task is detached
       do_other_things();
+  }
+  ```
+
+- `static_thread_pool.h / .cpp`: Provides a simple static thread pool implementation `static_thread_pool`. The thread pool type satisfies `scheduler`.
+
+  ```cpp
+  clu::static_thread_pool pool;
+  
+  clu::task<> task()
+  {
+      std::cout << "On original thread!\n";
+      co_await pool.schedule();
+      std::cout << "Now I'm on the thread pool!\n";
+  }
+  ```
+  
+- `task.h`: Lazy task type `task<T>`, supports `co_await` operations.
+
+  ```cpp
+  clu::task<> some_task()
+  {
+      const int result = co_await async_long_task();
+      co_return 42 + result;
   }
   ```

@@ -2,6 +2,8 @@
 
 #include <coroutine>
 
+#include "concepts.h"
+
 namespace clu
 {
     namespace detail
@@ -19,6 +21,5 @@ namespace clu
         };
     }
 
-    template <typename Awaitable>
-    detail::spawn_t spawn(Awaitable awaitable) { co_await awaitable; }
+    template <awaitable A> detail::spawn_t spawn(A awt) { co_await awt; }
 }
