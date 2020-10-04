@@ -47,12 +47,13 @@ endfunction ()
 add_executable(coro)
 add_sources(CORO_SOURCES
     "main.cpp"
-    "concepts.h"
-    "generator.h"
-    "schedule.h"
-    "spawn.h"
-    "static_thread_pool.h"
-    "static_thread_pool.cpp"
-    "task.h")
-target_sources(coro PRIVATE ${CORO_SOURCES})
+    "coro/concepts.h"
+    "coro/generator.h"
+    "coro/schedule.h"
+    "coro/spawn.h"
+    "coro/static_thread_pool.h"
+    "coro/static_thread_pool.cpp"
+    "coro/sync_wait.h"
+    "coro/task.h")
+target_sources(coro PRIVATE ${CORO_SOURCES} "src/coro/detail/value_wrapper.h")
 config_target(coro)

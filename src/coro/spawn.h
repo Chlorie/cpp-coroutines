@@ -2,7 +2,7 @@
 
 #include <coroutine>
 
-#include "concepts.h"
+#include "schedule.h"
 
 namespace clu
 {
@@ -21,5 +21,12 @@ namespace clu
         };
     }
 
-    template <awaitable A> detail::spawn_t spawn(A awt) { co_await awt; }
+    template <awaitable_of<void> A> detail::spawn_t spawn(A awt) { co_await awt; }
+
+    template <awaitable_of<void> A, scheduler S>
+    detail::spawn_t spawn_on(A awt, S& sch)
+    {
+        co_await sch.schedule();
+        co_await awt;
+    }
 }

@@ -1,9 +1,10 @@
 #include <chrono>
 #include <iostream>
 
-#include "task.h"
-#include "spawn.h"
-#include "static_thread_pool.h"
+#include "coro/spawn.h"
+#include "coro/static_thread_pool.h"
+#include "coro/task.h"
+#include "coro/sync_wait.h"
 
 using namespace std::literals;
 
@@ -24,18 +25,21 @@ void print_thread()
     std::cout << "Now on thread " << std::this_thread::get_id() << '\n';
 }
 
+clu::static_thread_pool pool;
+
 int main() // NOLINT
 {
-    clu::static_thread_pool pool;
-    spawn([&]()-> clu::task<>
+    sync_wait([&]()-> clu::task<>
     {
         print_thread();
-        for (size_t i = 0; i < 10; i++)
-            spawn([&]()-> clu::task<>
+        for (size_t i = 0; i < 4; i++)
+            spawn_on([&]()-> clu::task<> // TODO: next target: when_all
             {
+                print_thread();
+                std::this_thread::sleep_for(1s);
                 co_await schedule_on(pool);
                 print_thread();
-            }());
+            }(), pool);
         co_return;
     }());
 }

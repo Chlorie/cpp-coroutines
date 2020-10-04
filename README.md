@@ -6,7 +6,8 @@ Test things out and try to learn C++20 coroutines.
 
   ```cpp
   static_assert(clu::awaiter<clu::task<>>);
-  static_assert(clu::awaitable_of<clu::task<int>, int>)
+  static_assert(clu::awaiter_of<clu::task<int>, int>);
+  static_assert(std::same_as<clu::awaiter_result_t<clu::task<int>&&>, int&&>);
   ```
   
 - `generator.h`: Generator type `generator<T>`, supports `co_yield` operations.
@@ -56,6 +57,22 @@ Test things out and try to learn C++20 coroutines.
       std::cout << "On original thread!\n";
       co_await pool.schedule();
       std::cout << "Now I'm on the thread pool!\n";
+  }
+  ```
+  
+- `sync_wait.h`: Wait for an awaitable's completion on the current thread and retrieve the result using `sync_wait`.
+
+  ```cpp
+  clu::task<> task()
+  {
+      std::this_thread::sleep_for(1s);
+      co_return 42;
+  }
+  
+  int main()
+  {
+      const int answer = sync_wait(task());
+      std::cout << "The answer is " << answer << '\n';
   }
   ```
   
