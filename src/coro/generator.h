@@ -137,12 +137,20 @@ namespace clu
             return *this;
         }
 
-        iterator begin() const noexcept
+        iterator begin() noexcept
         {
             handle_.resume();
             return iterator(handle_);
         }
         sentinel end() const noexcept { return {}; }
+
+        decltype(auto) next() const
+        {
+            handle_.resume();
+            return handle_.promise().get();
+        }
+        decltype(auto) operator()() const { return next(); }
+        bool done() const { return handle_.done(); }
     };
 
     namespace detail

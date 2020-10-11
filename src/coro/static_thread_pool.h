@@ -32,19 +32,19 @@ namespace clu
     class static_thread_pool final
     {
     public:
-        class work final
+        class awaiter final
         {
         private:
             static_thread_pool* pool_ = nullptr;
 
         public:
-            explicit work(static_thread_pool* pool): pool_(pool) {}
+            explicit awaiter(static_thread_pool* pool): pool_(pool) {}
 
             bool await_ready() const noexcept { return false; }
             void await_suspend(const std::coroutine_handle<> handle) { pool_->enqueue_work(handle); }
             void await_resume() const noexcept {}
         };
-        friend class work;
+        friend class awaiter;
 
     private:
         static constexpr size_t spin_times = 2;
@@ -61,7 +61,7 @@ namespace clu
         explicit static_thread_pool(size_t thread_count = std::thread::hardware_concurrency());
         ~static_thread_pool() noexcept;
 
-        work schedule() { return work(this); }
+        awaiter schedule() { return awaiter(this); }
     };
 
     static_assert(scheduler<static_thread_pool>);

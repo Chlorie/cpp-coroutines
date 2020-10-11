@@ -44,6 +44,8 @@ function (config_target TGT)
     endif ()
 endfunction ()
 
+find_package(fmt CONFIG REQUIRED)
+
 add_executable(coro)
 add_sources(CORO_SOURCES
     "main.cpp"
@@ -54,6 +56,10 @@ add_sources(CORO_SOURCES
     "coro/static_thread_pool.h"
     "coro/static_thread_pool.cpp"
     "coro/sync_wait.h"
-    "coro/task.h")
+    "coro/task.h"
+    "coro/timer.h"
+    "coro/timer.cpp"
+    "coro/when_all_ready.h")
 target_sources(coro PRIVATE ${CORO_SOURCES} "src/coro/detail/value_wrapper.h")
+target_link_libraries(coro PRIVATE fmt::fmt)
 config_target(coro)

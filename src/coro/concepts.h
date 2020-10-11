@@ -16,7 +16,7 @@ namespace clu
         template <typename T>
         concept half_awaiter = requires(T&& awt, std::coroutine_handle<> hdl)
         {
-            { awt.await_ready() } -> std::convertible_to<bool>;
+            { awt.await_ready() ? (void)0 : (void)0 };
             { awt.await_suspend(hdl) } -> valid_await_suspend_type;
         };
     }
@@ -73,4 +73,20 @@ namespace clu
     {
         using type = await_result_t<T>;
     };
+
+    template <typename T, typename E = std::exception_ptr>
+    concept receiver = std::move_constructible<T> && requires(T recv, E error)
+    {
+        &T::operator();
+        { recv.set_error(error) } -> std::same_as<void>;
+        { recv.set_done() } -> std::same_as<void>;
+    };
+
+    template <typename T, typename... V>
+    concept receiver_of = receiver<T> && requires(T recv, V... args)
+    {
+        { recv(args...) } -> std::same_as<void>;
+    };
+
+
 }
