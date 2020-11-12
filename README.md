@@ -1,5 +1,7 @@
 # C++ Coroutines
 
+**Most code in this repo is copied to the clu project, thus this repo is archived.**
+
 Test things out and try to learn C++20 coroutines.
 
 - `concepts.h`: Basic coroutine concepts.
